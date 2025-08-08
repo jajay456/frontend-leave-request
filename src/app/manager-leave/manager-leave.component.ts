@@ -28,6 +28,10 @@ export class ManagerLeaveComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
 ngOnInit(): void {
+  this.loadLeaveRequests();
+}
+
+loadLeaveRequests() {
   this.http.get<LeaveRequest[]>('http://localhost:8080/api/api/leave-requests/pending')
     .subscribe(data => {
       this.leaveRequests = data.map(req => ({
@@ -35,6 +39,7 @@ ngOnInit(): void {
         managerComment: req.managerComment || ''
       }));
     });
+
 }
 
 
@@ -44,11 +49,12 @@ approveLeave(req: any, comment: string | undefined) {
     managerComment: comment
   };
 
-  this.http.put(`http://localhost:8080/api/update-leave-status/${req.id}`, body)
+  this.http.put(`http://localhost:8080/api/admin/update-leave-status/${req.id}`, body)
     .subscribe({
       next: res => {
         alert('Approved');
         this.removeRequest(req.id);
+        this.loadLeaveRequests();
       },
       error: err => {
         alert('Approved failed');
@@ -62,11 +68,12 @@ rejectLeave(req: any, comment: string | undefined) {
     managerComment: comment
   };
 
-  this.http.put(`http://localhost:8080/api/update-leave-status/${req.id}`, body)
+  this.http.put(`http://localhost:8080/api/admin/update-leave-status/${req.id}`, body)
     .subscribe({
       next: res => {
         alert('Rejected');
         this.removeRequest(req.id);
+        this.loadLeaveRequests();
       },
       error: err => {
         alert('Rejected failed');

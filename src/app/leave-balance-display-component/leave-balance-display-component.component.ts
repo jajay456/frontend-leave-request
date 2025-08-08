@@ -103,7 +103,7 @@ export class LeaveBalanceDisplayComponentComponent implements OnInit {
       params = params.set('department', department);
     }
 
-    this.http.get<LeaveReport[]>('http://localhost:8080/api/leave-report', { params })
+    this.http.get<LeaveReport[]>('http://localhost:8080/api/admin/leave-report', { params })
       .subscribe({
         next: (data) => {
           this.reports = data;

@@ -1,37 +1,65 @@
 <div class="container-fluid py-4">
-  <h5 class="fw-bold border-bottom pb-2 ">ระบบลางาน</h5>
+  <div class="container-fluid">
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <h5 class="fw-bold pb-2">ระบบลางาน</h5>
+      </li>
+
+      <ng-container *ngIf="auth.user$ | async as user; else loggedOut">
+        <ul class="navbar-nav d-flex align-items-center ms-auto flex-row">
+          <li class="nav-item">
+            <span class="nav disabled">{{ user.username }}</span>
+          </li>
+          <li class="mx-2 d-none d-md-block">|</li>
+          <li class="nav-item">
+            <a class="nav text-danger" (click)="logout()">Logout</a>
+          </li>
+        </ul>
+
+      </ng-container>
+
+      <ng-template #loggedOut>
+        <li class="nav-item ms-auto">
+          <a class="nav" routerLink="/login" routerLinkActive="active">Login</a>
+        </li>
+        <li class="nav mx-3 d-none d-md-block">|</li>
+        <li class="nav-item">
+          <a class="nav" routerLink="/register" routerLinkActive="active">Register</a>
+        </li>
+      </ng-template>
+
+
+
+    </ul>
+  </div>
 </div>
+
 <div class="col-12 mx-auto">
-<div class="container-fluid">
-  <ul class="nav nav-tabs mb-4">
-    <li class="nav-item">
-      <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">แดชบอร์ด</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLink="/request-leave" routerLinkActive="active">ขอลางาน</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLink="/leave-history" routerLinkActive="active">ประวัติการลา</a>
-    </li>
-    <li class="nav-item ms-auto">
-      <a class="nav-link" routerLink="/leave-manager" routerLinkActive="active">อนุมัติ</a>
-    </li>
-      <li class="nav-item ">
-      <a class="nav-link" routerLink="/leave-balance" routerLinkActive="active">สถิติ</a>
-    </li>
-  </ul>
+  <div class="container-fluid">
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">แดชบอร์ด</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/request-leave" routerLinkActive="active">ขอลางาน</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/leave-history" routerLinkActive="active">ประวัติการลา</a>
+      </li>
+      <li class="nav-item "  *ngIf="(auth.role$ | async) === 'ADMIN'">
+        <a class="nav-link" routerLink="/leave-manager" routerLinkActive="active">อนุมัติ</a>
+      </li>
+      <li class="nav-item " *ngIf="(auth.role$ | async) === 'ADMIN'">
+        <a class="nav-link" routerLink="/leave-balance" routerLinkActive="active">สถิติ</a>
+      </li>
+    </ul>
 
 
-  <router-outlet></router-outlet>
+    <router-outlet></router-outlet>
 
-<div class="theme-toggle">
-  <label class="switch">
-    <input
-      type="checkbox"
-      aria-label="Toggle dark mode"
-      (change)="toggleTheme($event)"
-      [checked]="isDark"
-    >
-    <span class="slider round"></span>
-  </label>
-</div>
+    <div class="theme-toggle">
+      <label class="switch">
+        <input type="checkbox" aria-label="Toggle dark mode" (change)="toggleTheme($event)" [checked]="isDark">
+        <span class="slider round"></span>
+      </label>
+    </div>

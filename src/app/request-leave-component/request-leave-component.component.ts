@@ -1,15 +1,14 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
-import {  HttpClient } from '@angular/common/http';
-
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-request-leave-component',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, NgbDatepickerModule,  ],
+  imports: [CommonModule, RouterModule, FormsModule, NgbDatepickerModule],
   templateUrl: './request-leave-component.component.html',
   styleUrl: './request-leave-component.component.scss'
 })
@@ -24,33 +23,55 @@ export class RequestLeaveComponentComponent {
   endDate: any;
   reason = '';
 
-  constructor(private http: HttpClient) {}
+  isSubmitting = false;
 
-  submitLeave() {
-  const payload = {
-    userId: 1, 
-    leaveTypeId: this.leaveType, 
-    startDate: this.startDate,
-    endDate: this.endDate,
-    reason: this.reason
-  };
+  private http = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID);
 
-      this.http.post('http://localhost:8080/api/create-leave-requests', payload)
+
+  formatDate(dateObj: any): string {
+    if (!dateObj) return '';
+    const year = dateObj.year;
+    const month = String(dateObj.month).padStart(2, '0');
+    const day = String(dateObj.day).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+ submitLeave() {
+  if (isPlatformBrowser(this.platformId)) {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+      alert('ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่');
+      return;
+    }
+
+    const payload = {
+      userId: +userId,
+      leaveTypeId: this.leaveType,
+      startDate: this.startDate,
+      endDate: this.endDate,
+      reason: this.reason
+    };
+
+    this.http.post('http://localhost:8080/api/create-leave-requests', payload)
       .subscribe({
-        next: res => {
-          alert('ส่งคำขอลาสำเร็จ');
-        },
-        error: err => {
+        next: () => alert('ส่งคำขอลาสำเร็จ'),
+        error: (err) => {
+          console.error('❌ ส่งคำขอลาไม่สำเร็จ:', err);
           alert('เกิดข้อผิดพลาดในการส่งคำขอลา');
         }
       });
+  } else {
+    console.warn('ไม่สามารถเข้าถึง localStorage ได้จากฝั่งเซิร์ฟเวอร์');
   }
+}
+
+
   cancel() {
     this.leaveType = null;
     this.startDate = undefined;
     this.endDate = undefined;
     this.reason = '';
   }
-
-
 }

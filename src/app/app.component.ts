@@ -1,31 +1,31 @@
+// src/app/app.component.ts
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from './services/auth.service';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterModule } from '@angular/router';
-import { DashboardComponentComponent } from './dashboard-component/dashboard-component.component';
-import { RequestLeaveComponentComponent } from './request-leave-component/request-leave-component.component';
-import { LeaveHistoryComponentComponent } from './leave-history-component/leave-history-component.component';
-import { ManagerLeaveComponent } from './manager-leave/manager-leave.component';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterModule,
-    RouterOutlet,
-    DashboardComponentComponent,
-    RequestLeaveComponentComponent,
-    LeaveHistoryComponentComponent,
-    ManagerLeaveComponent
-  ],
+  imports: [RouterModule, RouterOutlet, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'leave-management-frontend';
- isDark = false;
+  
+  constructor(public auth: AuthService, private router: Router) {}
+  isDark = false;
+  
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
 
-toggleTheme(event: Event) {
-  this.isDark = (event.target as HTMLInputElement).checked;
-  const theme = this.isDark ? 'dark' : 'light';
-  document.body.setAttribute('data-bs-theme', theme);
-}
+  toggleTheme(event: Event) {
+    this.isDark = (event.target as HTMLInputElement).checked;
+    const theme = this.isDark ? 'dark' : 'light';
+    document.body.setAttribute('data-bs-theme', theme);
+  }
 }
